@@ -1,7 +1,8 @@
 import asyncio
 import os
 
-import requests
+# import requests
+from typing import Optional
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import (
@@ -165,7 +166,8 @@ async def receive_and_parse_admarginem_link(
 
     if "admarginem.ru" not in user_message:
         await update.message.reply_text(
-            "Пока я принимаю только ссылки с admarginem.ru, и команды: см /start"
+            "Пока я принимаю только ссылки с admarginem.ru, "
+            "и команды: см /start"
         )
     else:
         price = parse_price_admarginem(user_message)
@@ -177,7 +179,7 @@ async def receive_and_parse_admarginem_link(
 # операции с линками вкусвилл: save, show, del
 async def handle_and_save_vkusvill_link(
     update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> str:
+) -> Optional[str]:
     user_link = update.message.text
     await update.message.reply_text("Проверяю, что ссылка рабочая")
     if "vkusvill.ru/goods/" not in user_link:
@@ -185,7 +187,7 @@ async def handle_and_save_vkusvill_link(
             "Принимаю только ссылки на товары.\n"
             "Они расположены в разделе vkusvill.ru/goods/"
         )
-        return
+        return None
 
     # проверка, что передана рабочая ссылка
     try:
@@ -197,7 +199,7 @@ async def handle_and_save_vkusvill_link(
             return await update.message.reply_text(
                 "Цена не найдена. Проверьте пожалуйста ссылку")
     except Exception as e:
-        print(e)
+        print(e)  # поменять
         await update.message.reply_text(
             "Неверный формат или нерабочая ссылка."
         )
@@ -208,6 +210,7 @@ async def handle_and_save_vkusvill_link(
     await update.message.reply_text("Сохраняю")
     result = save_user_link(update.effective_user.id, user_link)
     await update.message.reply_text(result)
+    return None
 
 
 async def del_links(
